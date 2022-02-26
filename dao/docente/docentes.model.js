@@ -13,6 +13,10 @@ class Docentes {
         // Si la conexión a la base de datos se hace de manera correcta.
         db = database;
         this.collection = db.collection("Docentes");
+        this.collection.createIndex(
+          { identidad: 1, email: 1 },
+          { unique: true }
+        );
       })
       .catch((err) => {
         console.error(err);
