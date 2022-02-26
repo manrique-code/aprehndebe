@@ -1,0 +1,116 @@
+{
+    "Docente":{
+        "Identidad":"UNICO",
+        "Nombres":"",
+        "Apellidos":"",
+        "Fecha de nacimiento":"",
+        "Titulos Academicos":[{}],
+        "Genero":"",
+        "Telefono":[{}],
+        "Foto de perfil":"Archivo .JPG",
+        "Direccion":[{}],
+        "user":{
+            "email":"UNICO",
+            "password":"",
+            "state":"Activo || Inactivo",
+            "tipo":"Admin || Docente || Estudiante"
+        }
+    },
+    "Estudiante":{
+        "Identidad":"UNICO",
+        "Nombres":"",
+        "Apellidos":"",
+        "Fecha de nacimiento":"",
+        "Genero":"",
+        "Telefono":[{}],
+        "Foto de perfil":"Archivo .JPG",
+        "Direccion":[{}],
+        "Encargado":{
+            "nombre":"",
+            "apellido":"",
+            "telefono":[{}],
+            "email":""
+        },
+        "user":{
+            "email":"UNICO",
+            "password":"",
+            "state":"Activo || Inactivo",
+            "tipo":"Admin || Docente || Estudiante"
+        }
+    },
+
+    "Clase":{
+        "Nombre":"",
+        "Seccion":"",
+        "Codigo":"",
+        "Anuncios":[{
+            "fecha":"",
+            "Descripcion":""
+        }],
+        "Docente":"ObjectId()",
+        "Estado":"MATRICULA || CANCELACION || CURSANDO || CULMINADO",
+        "Horario":{
+            "Hora":"",
+            "Dias":[]     // DOMINGO = 0, LUNES =1 ...
+        },
+        "Estudiantes":[{
+            "Id":"ObjectId",
+            "InfoEstudiante":{
+                "Nota":[],
+                "Estado":"APROBADO || REPROBADO"
+            }
+        }],
+        "TareaAsignable":{
+            "Clase":"ObjectId",
+            "Fecha asignada":"",
+            "Fecha  entrega":"",
+            "Estado" : "RETRASADO || A TIEMPO",
+            "Info":{
+                "Titulo":"",
+                "Descripcion":"",
+                "Puntaje":"numerico"
+            }
+        }
+    
+    },
+
+
+
+
+    "Matricula":{
+        "Clase_id":"ObjectId",
+        "Estudiante_id":"ObjectId",
+        "TareaEntregable":{
+            "TareaAsignable":"ObjectId",
+            "Fecha entregado":"",
+            "Documento":"",
+            "Estado": "ENTREGADO || NO ENTREGADO",
+            "Puntaje":"numerico"
+        }
+           
+    },
+
+
+
+    "Prueba":{
+        "Identidad": "0601200400159",
+        "Nombres": "Osman Daniel",
+        "Apellidos": "Paizano Betancourth",
+        "Fecha de nacimiento": "20030927",
+        "Genero": "Masculino",
+        "Telefono": [ { "casa": "27822817"} ],
+        "Foto de perfil": "Archivo .JPG",
+        "Direccion": [ { "casa": "Bo. San Juan Bosco" } ],
+        "Encargado": 
+        { "nombre": "Osman Yamil",
+        "apellido": "Paizano Herrera",
+        "telefono": [ { "Personal": "87299886"} ],
+        "email": "oyamilpaiza@gmail.com"},
+        "user": 
+        { "email": "opaizano@unicah.edu",
+        "password": "unicah1234",
+        "state": "Activo",
+        "tipo": "Estudiante" } 
+
+    }
+}
