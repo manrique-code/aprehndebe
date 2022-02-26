@@ -23,6 +23,18 @@ class Docentes {
       });
   }
 
+  /**
+   * Método para ingresar los datos personales del docente a la base de datos.
+   * @param {string} identidad Número de identindad único del docente
+   * @param {string} nombres Nombre y segundo nombre del docente
+   * @param {string} apellidos Primer y segudo apellidio
+   * @param {string} fechaNacimiento YYYY-MM-DD
+   * @param {Array} titulosAcademicos Arreglo de títulos académicos
+   * @param {string} genero Genero
+   * @param {Array} telefono Arreglo de número telefónicos
+   * @param {Array} direccion Arreglo de direcciones
+   * @returns Object
+   */
   async newDocente(
     identidad,
     nombres,
