@@ -1,5 +1,8 @@
+const bcrypt = require("bcryptjs");
 const { ObjectId } = require("mongodb");
 const getDb = require("../mongodb");
+const Usuarios = require("../seguridad/usuarios.model");
+const usuariosModel = new Usuarios();
 let db = null;
 
 class Docentes {
