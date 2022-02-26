@@ -58,6 +58,32 @@ class Docentes {
     const resultado = await this.collection.insertOne(docente);
     return resultado;
   }
+
+  /**
+   * Método para crear el usuario a un docente.
+   * @param {string} identidad Identidad de un usuario existente.
+   * @param {string} email Email irrepetible.
+   * @param {string} password Contraseña sin encriptar.
+   * @returns Object
+   */
+  async newUsuarioDocente(identidad, email, password) {
+    const filtro = { identidad };
+    const usuarioDocente = {
+      $set: {
+        usuario: {
+          email,
+          password: await usuariosModel.hashPassword(password),
+          estado: "Activo",
+          tipo: "Docente",
+        },
+      },
+    };
+    const seCreoUsuario = await this.collection.updateOne(
+      filtro,
+      usuarioDocente
+    );
+    return seCreoUsuario;
+  }
 }
 
 module.exports = Docentes;
