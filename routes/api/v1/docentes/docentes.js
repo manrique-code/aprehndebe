@@ -14,7 +14,6 @@ router.get("/", (req, res) => {
 // Ruta para crear un docente: post /new
 router.post("/new", async (req, res) => {
   try {
-    console.log(req.body);
     const {
       identidad,
       nombres,
