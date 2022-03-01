@@ -51,7 +51,7 @@
         "Estado":"MATRICULA || CANCELACION || CURSANDO || CULMINADO",
         "Horario":{
             "Hora":"",
-            "Dias":[]     // DOMINGO = 0, LUNES =1 ...
+            "Dias":[]
         },
         "Estudiantes":[{
             "Id":"ObjectId",
