@@ -42,6 +42,37 @@ router.post("/new", async (req, res) => {
   }
 }); // post: /new
 
+// Ruta para modificar la informacion de un docente update/
+router.put("/update/:id", async(req, res) =>{
+  try{
+    const {id} = req.params
+    const {
+      identidad,
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      titulosAcademicos,
+      genero,
+      telefono,
+      direccion,} =  req.body;
+    const rslt = await docenteModel.updateDocente(
+      id,
+      identidad,
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      titulosAcademicos,
+      genero,
+      telefono,
+      direccion
+    )
+    res.status(200).json({"status":"ok",rslt})
+  }catch(ex){
+    console.log(ex);
+    res.status(500).json({"status":"failed"})
+  }
+}); //put /docentes/update/:id
+
 // Ruta para crear el usuario de un docente /signin
 router.put("/signin/:identidad", async (req, res) => {
   try {
@@ -58,6 +89,21 @@ router.put("/signin/:identidad", async (req, res) => {
     res.status(500).json({ status: "failed" });
   }
 });
+
+//Ruta para actualizar los usuarios de docentes, 
+router.put("/updateuser/:identidad",async(req,res)=>{
+  try{
+    const {estado,email,tipo,password} = req.body;
+    const {identidad} = req.params;
+    
+   
+    const rslt =  await docenteModel.updateUser(identidad,email,password,estado,tipo)
+    res.status(200).json({"status":"ok"})
+  }catch(ex){
+    console.log(ex);
+    res.status(500).json({"status":"failed"})
+  }
+})
 // post: /sigin
 
 module.exports = router;

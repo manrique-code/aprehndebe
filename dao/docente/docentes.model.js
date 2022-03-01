@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { ObjectId } = require("mongodb");
+const ObjectId = require('mongodb').ObjectId;
 const getDb = require("../mongodb");
 const Usuarios = require("../seguridad/usuarios.model");
 const usuariosModel = new Usuarios();
@@ -84,6 +84,75 @@ class Docentes {
     );
     return seCreoUsuario;
   }
+  
+  // Esta funcion permite al docente editar parcialmente sus datos personales,
+  // no esta permitido que este cambie su identidad ya que son datos unicos requeridos
+   /**
+   * @param {string} identidad Número de identindad único del docente
+   * @param {string} nombres Nombre y segundo nombre del docente
+   * @param {string} apellidos Primer y segudo apellidio
+   * @param {string} fechaNacimiento YYYY-MM-DD
+   * @param {Array} titulosAcademicos Arreglo de títulos académicos
+   * @param {string} genero Genero
+   * @param {Array} telefono Arreglo de número telefónicos
+   * @param {Array} direccion Arreglo de direcciones
+   * @returns Object
+   */
+  async updateDocente(
+    id,
+    identidad,
+    nombres,
+    apellidos,
+    fechaNacimiento,
+    titulosAcademicos,
+    genero,
+    telefono,
+    direccion
+  ){
+    const filter ={_id:new ObjectId(id)};
+    const updateCmd = {
+      "$set":{
+        identidad,
+        nombres,
+        apellidos,
+        fechaNacimiento,
+        titulosAcademicos,
+        genero,
+        telefono,
+        direccion
+      }
+    };
+    const rslt = await this.collection.updateOne(filter,updateCmd);
+    return rslt;
+
+  } /// update
+
+  // Actualizacion de ususarios de docentes
+  /**
+   * 
+   * @param {string} id Id de la coleccion de docente
+   * @param {string} estado
+   * @param {string} tipo
+   * @param {string} email Email irrepetible.
+   * @param {string} password Contraseña sin encriptar.
+   * @returns Object
+   */
+  async updateUser(id, email, password,estado,tipo){
+    const filtro = {"_id": new ObjectId(id)};
+    const updateCmd = {
+      "$set":{
+          "usuario":{
+            email,
+            password:await usuariosModel.hashPassword(password),
+            estado,
+            tipo,
+          }
+      }
+    }
+    const rslt = await this.collection.updateOne(filtro,updateCmd);
+    return rslt;
+  }
+
 }
 
 module.exports = Docentes;
