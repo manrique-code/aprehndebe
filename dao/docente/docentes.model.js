@@ -35,6 +35,7 @@ class Docentes {
    * @param {Array} direccion Arreglo de direcciones
    * @returns Object
    */
+
   async newDocente(
     identidad,
     nombres,
@@ -66,6 +67,7 @@ class Docentes {
    * @param {string} password Contraseña sin encriptar.
    * @returns Object
    */
+
   async newUsuarioDocente(identidad, email, password) {
     const filtro = { identidad };
     const usuarioDocente = {
@@ -84,6 +86,29 @@ class Docentes {
     );
     return seCreoUsuario;
   }
+
+  // inactivar el usuario del docente
+  async updateUserStatus(id, usuario) {
+    const filtro = { _id: new ObjectId(id)}
+    const userStatus = {
+      "$set": {
+        "usuario.estado":"Inactivo"
+      }
+    };
+    const rslt = await this.collection.updateOne(filtro, userStatus);
+  }
+
+  //activar el usuario del docente
+  async updateUserStatusV(id, usuario) {
+    const filtro = { _id: new ObjectId(id)}
+    const userStatus = {
+      "$set": {
+        "usuario.estado":"Activo"
+      }
+    };
+    const rslt = await this.collection.updateOne(filtro, userStatus);
+  }
+
 }
 
 module.exports = Docentes;
