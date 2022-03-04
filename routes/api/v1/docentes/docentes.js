@@ -43,9 +43,9 @@ router.post("/new", async (req, res) => {
 }); // post: /new
 
 // Ruta para modificar la informacion de un docente update/
-router.put("/update/:id", async(req, res) =>{
-  try{
-    const {id} = req.params
+router.put("/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
     const {
       identidad,
       nombres,
@@ -54,7 +54,8 @@ router.put("/update/:id", async(req, res) =>{
       titulosAcademicos,
       genero,
       telefono,
-      direccion,} =  req.body;
+      direccion,
+    } = req.body;
     const rslt = await docenteModel.updateDocente(
       id,
       identidad,
@@ -65,76 +66,89 @@ router.put("/update/:id", async(req, res) =>{
       genero,
       telefono,
       direccion
-    )
-    res.status(200).json({"status":"ok",rslt})
-  }catch(ex){
+    );
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
     console.log(ex);
-    res.status(500).json({"status":"failed"})
+    res.status(500).json({ status: "failed" });
   }
 }); //put /docentes/update/:id
 
 // Ruta para crear el usuario de un docente /signin
-router.put("/signin/:identidad", async (req, res) => {
+/*
+Evaluando la posibilidad de que esta ruta sea deprecated 
+por la nueva implementación con tokens.
+router.put("/signin/:id", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { identidad } = req.params;
-    const result = await docenteModel.newUsuarioDocente(
-      identidad,
+    const { id } = req.params;
+    const docenteCreado = await docenteModel.newUsuarioDocente(
+      id,
       email,
       password
     );
-    res.status(200).json({ status: "success", result });
+    if (docenteCreado) {
+      const usuarioDocenteCreado =
+        await docenteModel.crearUsuarioDocenteVerificable(id);
+      if (usuarioDocenteCreado) {
+      }
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-});
+});*/
 
-//Ruta para actualizar los usuarios de docentes, 
-router.put("/updateuser/:identidad",async(req,res)=>{
-  try{
-    const {estado,email,tipo,password} = req.body;
-    const {identidad} = req.params;
-    
-   
-    const rslt =  await docenteModel.updateUser(identidad,email,password,estado,tipo)
-    res.status(200).json({"status":"ok"})
-  }catch(ex){
+//Ruta para actualizar los usuarios de docentes,
+router.put("/updateuser/:identidad", async (req, res) => {
+  try {
+    const { estado, email, tipo, password } = req.body;
+    const { identidad } = req.params;
+
+    const rslt = await docenteModel.updateUser(
+      identidad,
+      email,
+      password,
+      estado,
+      tipo
+    );
+    res.status(200).json({ status: "ok" });
+  } catch (ex) {
     console.log(ex);
-    res.status(500).json({"status":"failed"})
+    res.status(500).json({ status: "failed" });
   }
-})
+});
 // post: /sigin
 
 // Ruta para desactivar el usuario de un docente
 router.put("/editUserStatus/:id", async (req, res) => {
   try {
-    const {usuario} = req.body
+    const { usuario } = req.body;
     const { id } = req.params;
     const result = await docenteModel.updateUserStatus(id, usuario);
     res.status(200).json({
-      status: 'ok',
-      result
+      status: "ok",
+      result,
     });
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ status: "failed" })
+    res.status(500).json({ status: "failed" });
   }
 });
 
 //Ruta para activar el usuario de un docente
 router.put("/editUserStatusV/:id", async (req, res) => {
   try {
-    const {usuario} = req.body
+    const { usuario } = req.body;
     const { id } = req.params;
     const result = await docenteModel.updateUserStatusV(id, usuario);
     res.status(200).json({
-      status: 'ok',
-      result
+      status: "ok",
+      result,
     });
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ status: "failed" })
+    res.status(500).json({ status: "failed" });
   }
 });
 
