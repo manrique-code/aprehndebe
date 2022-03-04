@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Docente = require("../../../../dao/docente/docentes.model");
 const docenteModel = new Docente();
+const Mail = require("../../../../dao/mail/mailSender");
+const mailSender = new Mail();
+const Seguridad = require("../../../../dao/seguridad/seguridad");
+const seguridadModel = new Seguridad();
 
 router.get("/", (req, res) => {
   try {
