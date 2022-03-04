@@ -84,6 +84,14 @@ class Docentes {
       filtro,
       usuarioDocente
     );
+
+    if (process.env.MIGRATE === "true") {
+      const index = this.collection.createIndex(
+        { "usuario.email": 1 },
+        { unique: true }
+      );
+    }
+
     return seCreoUsuario;
   }
 
