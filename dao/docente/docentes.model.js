@@ -134,7 +134,6 @@ class Docentes {
     };
     const rslt = await this.collection.updateOne(filter, updateCmd);
     return rslt;
-
   } /// update
 
   // Actualizacion de ususarios de docentes
@@ -207,7 +206,6 @@ class Docentes {
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
   }
-
 }
 
 module.exports = Docentes;
