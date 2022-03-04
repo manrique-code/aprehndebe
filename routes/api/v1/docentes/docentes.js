@@ -74,6 +74,60 @@ router.put("/update/:id", async (req, res) => {
   }
 }); //put /docentes/update/:id
 
+// Solamente para testear si se pueden enviar un mail.
+router.put("/usuario/:id", async (req, res) => {
+  let result = "";
+  const { email, password } = req.body;
+  const { id } = req.params;
+  try {
+    const payload = {
+      id,
+      email,
+      password,
+    };
+    const tokenGenerado = await seguridadModel.generarJwtTemporizado(payload);
+    if (tokenGenerado) {
+      result = await mailSender.enviarEmailTextoPlano(
+        email,
+        "Prueba de envio de correo electrónico",
+        `http://localhost:3000/api/v1/docentes/c/${tokenGenerado}`
+      );
+      // result = await mailSender.enviarMailConBoton(email, tokenGenerado);
+    }
+    res.status(200).json({
+      status: "success",
+      msg: "¡Correo enviado exitósamente!",
+      result,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
+/**
+ * Ruta para la creación del usuario.
+ */
+router.get("/c/:token", async (req, res) => {
+  const { token } = req.params;
+  let docenteCreado = "";
+  try {
+    const decryptedToken = await seguridadModel.decrypToken(token);
+    if (decryptedToken && decryptedToken.payload) {
+      const userInformation = decryptedToken.payload;
+      docenteCreado = await docenteModel.newUsuarioDocente(
+        userInformation.id,
+        userInformation.email,
+        userInformation.password
+      );
+    }
+    res.status(200).json({ status: "success", docenteCreado });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
 // Ruta para crear el usuario de un docente /signin
 /*
 Evaluando la posibilidad de que esta ruta sea deprecated 
