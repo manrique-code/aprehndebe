@@ -2,6 +2,8 @@ const ObjectId = require("mongodb").ObjectId;
 const getDb = require("../mongodb");
 const Usuarios = require("../seguridad/usuarios.model");
 const usuariosModel = new Usuarios();
+const Seguridad = require("../seguridad/seguridad");
+const seguridadModel = new Seguridad();
 let db = null;
 
 class Docentes {
@@ -152,6 +154,30 @@ class Docentes {
     const rslt = await this.collection.updateOne(filtro, updateCmd);
     return rslt;
   }
+
+  /**
+   * Método para insertar el usuario en la base de datos.
+   * @param {string} id ObjectId del usuario a verficar.
+   * @returns Object
+   */
+  crearUsuarioDocenteVerificable = async (id) => {
+    const filtro = { _id: ObjectId(id) };
+    const datosVerificacion = {
+      $set: {
+        verified: null,
+        verifyInfo: {
+          timestamp: new Date(),
+          verifyCode: seguridadModel.generarCodigoVerificacion(),
+        },
+      },
+    };
+    const seInsertoVerificacion = await this.collection.updateOne(
+      filtro,
+      datosVerificacion
+    );
+    return seInsertoVerificacion;
+  };
+
   // inactivar el usuario del docente
   async updateUserStatus(id, usuario) {
     const filtro = { _id: new ObjectId(id) };
