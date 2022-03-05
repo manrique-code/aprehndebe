@@ -102,6 +102,58 @@ class Estudiantes {
     );
     return seCreoUsuario;
   }
+
+//ACTUALIZAR INFORMACIÓN DEL ESTUDIANTE
+async updateStudent(id, identidad, nombres, apellidos, fechaNacimiento, genero, telefono, fotoPerfil, direccion) {
+  const filter = { _id: new ObjectId(id) };
+  const updateCmd = {
+    "$set": {
+      identidad,
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      genero,
+      telefono,
+      fotoPerfil,
+      direccion
+    }
+  };
+  const rslt = await this.collection.updateOne(filter, updateCmd);
+  return rslt;
+}
+
+async updateUserStudent(id, email, password, estado, tipo) {
+  const filtro = { "_id": new ObjectId(id) };
+  const updateCmd = {
+    "$set": {
+      "usuario": {
+        email,
+        password: await usuariosModel.hashPassword(password),
+        estado,
+        tipo,
+      }
+    }
+  }
+  const rslt = await this.collection.updateOne(filtro, updateCmd);
+  return rslt;
+}
+
+async updateStudentManager(id, nombre, apellido, telefono, email){
+  const filtro = { "_id": new ObjectId(id) };
+  const updateCmd = {
+    "$set": {
+      "encargado": {
+        nombre,
+        apellido,
+        telefono,
+        email,
+      }
+    }
+  }
+  const rslt = await this.collection.updateOne(filtro, updateCmd);
+  return rslt;
+}
+
   /**
    * metodo que resume dos modulos en uno, cambiando el estado de un estudiante
    * en una sola accion para optimizacion del proceso(CONSIDERAR ESTE METODO PARA DOCENTE)
