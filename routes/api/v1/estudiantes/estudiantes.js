@@ -81,4 +81,22 @@ router.put("/newencargado/:id", async (req, res) => {
 });
 // post: /sigin
 
+
+/**
+ * Ruta para cambiar el estado
+ */
+
+  router.put("/updatestatus/:id", async(req,res)=>{
+    try{
+      const {id} = req.params;
+      const rslt = await estudianteModel.updateUserStatus(id);
+      res.status(200).json({"status":"ok",rslt});
+    }catch(ex){
+      console.log(ex);
+      res.status(500).json({"status":"failed"})
+    }
+
+
+  })
+
 module.exports = router;

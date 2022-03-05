@@ -60,7 +60,6 @@
             }
         }],
         "TareaAsignable":{
-            "Clase":"ObjectId",
             "Fecha asignada":"",
             "Fecha  entrega":"",
             "Estado" : "RETRASADO || A TIEMPO",

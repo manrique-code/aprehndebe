@@ -102,6 +102,33 @@ class Estudiantes {
     );
     return seCreoUsuario;
   }
+  /**
+   * metodo que resume dos modulos en uno, cambiando el estado de un estudiante
+   * en una sola accion para optimizacion del proceso(CONSIDERAR ESTE METODO PARA DOCENTE)
+   * @param {String} id el unico parametro requerido es el objectID 
+   */
+  async updateUserStatus(id) {
+    const filtro = { _id: new ObjectId(id) };
+    const est = await this.collection.findOne(filtro);
+    let sta = (est.usuario.estado ==="Activo")? "Inactivo":"Activo";
+    const userStatus = {
+      $set: {
+        "usuario.estado": sta,
+      },
+    };
+    const rslt = await this.collection.updateOne(filtro, userStatus);
+  }
+
+  //habilitar el usuario de estudiante
+  // async updateUserActivate(id, usuario) {
+  //   const filtro = { _id: new ObjectId(id) };
+  //   const userStatus = {
+  //     $set: {
+  //       "usuario.estado": "Activo",
+  //     },
+  //   };
+  //   const rslt = await this.collection.updateOne(filtro, userStatus);
+  // }
 }
 
 module.exports = Estudiantes;

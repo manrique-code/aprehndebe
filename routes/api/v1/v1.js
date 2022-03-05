@@ -5,8 +5,12 @@ const router = express.Router();
 // Enrutador de Docentes.
 const docentesRoutes = require("./docentes/docentes");
 const estudiantesRoutes = require("./estudiantes/estudiantes");
+const clasesRoutes =  require("./clases/clases");
+const tareasRoutes = require("./tareas/tareas");
 
 router.use("/docentes", docentesRoutes);
 router.use("/estudiantes", estudiantesRoutes);
+router.use("/clases",clasesRoutes);
+router.use("/tareas",tareasRoutes);
 
 module.exports = router;
