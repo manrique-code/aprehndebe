@@ -169,7 +169,7 @@ router.put("/updateStudentManager/:id", async (req, res) => {
  * Ruta para cambiar el estado
  */
 
-  router.put("/updatestatus/:id", async(req,res)=>{
+  router.put("/updatestatus/:id", async(req,res)=>{ 
     try{
       const {id} = req.params;
       const rslt = await estudianteModel.updateUserStatus(id);
