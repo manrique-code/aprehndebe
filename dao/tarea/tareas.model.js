@@ -37,7 +37,6 @@ class Tareas {
         const filter = {"_id": new ObjectId(id)};
         const tareas = await this.collection.findOne(filter)
         const numeroTarea =tareas.tareaAsignada.length+1;
-        console.log(numeroTarea);
         const tareaCmd = {
             "$push":{
                 "tareaAsignada":{
@@ -76,7 +75,6 @@ class Tareas {
     async allTareasClase(id){
         const filter = {"_id":new ObjectId(id)}
         const tareas = await this.collection.findOne(filter)
-        console.log(tareas.tareaAsignada);
         return tareas.tareaAsignada;
     }
 
