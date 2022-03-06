@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const Docente = require("../../../../dao/docente/docentes.model");
 const docenteModel = new Docente();
@@ -6,6 +7,8 @@ const Mail = require("../../../../dao/mail/mailSender");
 const mailSender = new Mail();
 const Seguridad = require("../../../../dao/seguridad/seguridad");
 const seguridadModel = new Seguridad();
+const Usuarios = require("../../../../dao/seguridad/usuarios.model");
+const usuarioModel = new Usuarios("Docentes");
 
 router.get("/", (req, res) => {
   try {
@@ -79,7 +82,7 @@ router.put("/update/:id", async (req, res) => {
 }); //put /docentes/update/:id
 
 // Solamente para testear si se pueden enviar un mail.
-router.put("/usuario/:id", async (req, res) => {
+router.put("/signin/:id", async (req, res) => {
   let result = "";
   const { email, password } = req.body;
   const { id } = req.params;
@@ -130,32 +133,73 @@ router.get("/c/:token", async (req, res) => {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-});
+}); // get: confirmed
 
-// Ruta para crear el usuario de un docente /signin
-/*
-Evaluando la posibilidad de que esta ruta sea deprecated 
-por la nueva implementación con tokens.
-router.put("/signin/:id", async (req, res) => {
+/**
+ * Ruta para el inicio de sesión de un usuario.
+ */
+router.post("/login", async (req, res) => {
+  let notificarMail = null;
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-    const { id } = req.params;
-    const docenteCreado = await docenteModel.newUsuarioDocente(
-      id,
-      email,
-      password
-    );
-    if (docenteCreado) {
-      const usuarioDocenteCreado =
-        await docenteModel.crearUsuarioDocenteVerificable(id);
-      if (usuarioDocenteCreado) {
+    const existeMail = await usuarioModel.encontrarPorEmail(email);
+    if (existeMail) {
+      // Correo existe.
+      if (existeMail?.usuario?.estado === "Activo") {
+        // El usuario está activo.
+        const esContraCorrecta = await usuarioModel.comparePassword(
+          password,
+          existeMail?.usuario?.password
+        );
+        if (esContraCorrecta) {
+          // La contraseña es correcta.
+          const { _id } = existeMail;
+          const { email, tipo } = existeMail?.usuario;
+          const payload = {
+            jwt: jwt.sign({ _id, email, tipo }, process.env.JWT_SECRET, {
+              expiresIn: "1d",
+            }),
+            user: { _id, email, tipo },
+          };
+          if (payload?.jwt) {
+            notificarMail = await mailSender.enviarEmailTextoPlano(
+              email,
+              "Inicio de sesión",
+              `Han iniciado sesión desde ${req.get(
+                "User-Agent"
+              )} el ${new Date()}`
+            );
+          }
+          res.status(200).json({ status: "success", payload, notificarMail });
+        }
+        // La contraseña es incorrecta.
+        else
+          res.status(500).json({
+            status: "failed",
+            msg: "Usuario o contraseña incorrecta. Por favor revisá tus datos ingresados.",
+            error: 077,
+          });
       }
+      // El usuario no está activo.
+      else
+        res.status(500).json({
+          status: "failed",
+          msg: "Error al iniciar sesión. Por favor, intentalo más tarde.",
+          error: 075,
+        });
     }
+    // No existe el correo electrónico en la base de datos.
+    else
+      res.status(500).json({
+        status: "failed",
+        msg: "Error al iniciar sesión. Por favor, intentalo más tarde.",
+        error: 070,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-});*/
+}); // post: login
 
 //Ruta para actualizar los usuarios de docentes,
 router.put("/updateuser/:identidad", async (req, res) => {
@@ -170,7 +214,7 @@ router.put("/updateuser/:identidad", async (req, res) => {
       estado,
       tipo
     );
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
     console.log(ex);
     res.status(500).json({ status: "failed" });
