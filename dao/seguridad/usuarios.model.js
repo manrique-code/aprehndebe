@@ -1,6 +1,19 @@
 const bcrypt = require("bcryptjs");
+const { ObjectId } = require("mongodb");
+const getDb = require("../mongodb");
+let db = null;
 class Usuarios {
-  constructor() {}
+  tipo = "";
+  constructor(_collection) {
+    getDb()
+      .then((database) => {
+        db = database;
+        this.tipo = _collection;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
   /**
    * Método para encriptar la contraseña del usuario.
    * @param {string} rawPassword Contraseña sin encriptar.
@@ -20,6 +33,37 @@ class Usuarios {
   async comparePassword(rawPassword, dbPassword) {
     return await bcrypt.compare(rawPassword, dbPassword);
   }
+
+  /**
+   * Método para verificar si una dirección de correo electrónico existe en la base de datos.
+   * @param {string} email Dirección de correo electrónico del email a buscar
+   * @returns string
+   */
+  encontrarPorEmail = async (email) => {
+    const filtro = { "usuario.email": email };
+    const busqueda = {
+      projection: {
+        _id: 1,
+        usuario: 1,
+      },
+    };
+    const existeEmail = await db
+      .collection(this.tipo)
+      .findOne(filtro, busqueda);
+    return existeEmail;
+  };
+
+  /**
+   * Método para saber sí un usuario está activo.
+   * @param {string} email Dirección de correo electrónico del email a buscar
+   * @returns string
+   */
+  verificarUsuarioActivo = async (email) => {
+    const filtro = { "usuario.email": email };
+    const busqueda = { projection: { _id: 0, "usuario.estado": true } };
+    const estaActivo = await db.collection(this.tipo).findOne(filtro, busqueda);
+    return estaActivo?.usuario?.estado;
+  };
 }
 
 module.exports = Usuarios;
