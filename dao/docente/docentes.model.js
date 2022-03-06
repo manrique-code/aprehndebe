@@ -1,8 +1,9 @@
-const bcrypt = require("bcryptjs");
-const ObjectId = require('mongodb').ObjectId;
+const ObjectId = require("mongodb").ObjectId;
 const getDb = require("../mongodb");
 const Usuarios = require("../seguridad/usuarios.model");
 const usuariosModel = new Usuarios();
+const Seguridad = require("../seguridad/seguridad");
+const seguridadModel = new Seguridad();
 let db = null;
 
 class Docentes {
@@ -13,10 +14,9 @@ class Docentes {
         // Si la conexión a la base de datos se hace de manera correcta.
         db = database;
         this.collection = db.collection("Docentes");
-        this.collection.createIndex(
-          { identidad: 1, email: 1 },
-          { unique: true }
-        );
+        if (process.env.MIGRATE === "true") {
+          this.collection.createIndex({ identidad: 1 }, { unique: true });
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -62,14 +62,13 @@ class Docentes {
 
   /**
    * Método para crear el usuario a un docente.
-   * @param {string} identidad Identidad de un usuario existente.
+   * @param {string} id Identificador de un usuario existente.
    * @param {string} email Email irrepetible.
    * @param {string} password Contraseña sin encriptar.
    * @returns Object
    */
-
-  async newUsuarioDocente(identidad, email, password) {
-    const filtro = { identidad };
+  async newUsuarioDocente(id, email, password) {
+    const filtro = { _id: ObjectId(id) };
     const usuarioDocente = {
       $set: {
         usuario: {
@@ -84,23 +83,30 @@ class Docentes {
       filtro,
       usuarioDocente
     );
+
+    if (process.env.MIGRATE === "true") {
+      const index = this.collection.createIndex(
+        { "usuario.email": 1 },
+        { unique: true }
+      );
+    }
+
     return seCreoUsuario;
   }
 
-  // Esta funcion permite al docente editar parcialmente sus datos personales,
-  // no esta permitido que este cambie su identidad ya que son datos unicos requeridos
   /**
-  * @param {string} identidad Número de identidad único del docente
-  * @param {string} nombres Nombre y segundo nombre del docente
-  * @param {string} apellidos Primer y segudo apellidio
-  * @param {string} fechaNacimiento YYYY-MM-DD
-  * @param {Array} titulosAcademicos Arreglo de títulos académicos
-  * @param {string} genero Genero
-  * @param {Array} telefono Arreglo de número telefónicos
-  * @param {Array} direccion Arreglo de direcciones
-  * @returns Object
-  */
-
+   * Esta funcion permite al docente editar parcialmente sus datos personales
+   * no esta permitido que este cambie su identidad ya que son datos unicos requeridos
+   * @param {string} identidad Número de identindad único del docente
+   * @param {string} nombres Nombre y segundo nombre del docente
+   * @param {string} apellidos Primer y segudo apellidio
+   * @param {string} fechaNacimiento YYYY-MM-DD
+   * @param {Array} titulosAcademicos Arreglo de títulos académicos
+   * @param {string} genero Genero
+   * @param {Array} telefono Arreglo de número telefónicos
+   * @param {Array} direccion Arreglo de direcciones
+   * @returns Object
+   */
   async updateDocente(
     id,
     identidad,
@@ -114,7 +120,7 @@ class Docentes {
   ) {
     const filter = { _id: new ObjectId(id) };
     const updateCmd = {
-      "$set": {
+      $set: {
         identidad,
         nombres,
         apellidos,
@@ -122,17 +128,15 @@ class Docentes {
         titulosAcademicos,
         genero,
         telefono,
-        direccion
-      }
+        direccion,
+      },
     };
     const rslt = await this.collection.updateOne(filter, updateCmd);
     return rslt;
-
   } /// update
 
-  // Actualizacion de usuarios de docentes
   /**
-   * 
+   * Actualizacion de ususarios de docentes
    * @param {string} id Id de la coleccion de docente
    * @param {string} estado
    * @param {string} tipo
@@ -141,39 +145,62 @@ class Docentes {
    * @returns Object
    */
   async updateUser(id, email, password, estado, tipo) {
-    const filtro = { "_id": new ObjectId(id) };
+    const filtro = { _id: new ObjectId(id) };
     const updateCmd = {
-      "$set": {
-        "usuario": {
+      $set: {
+        usuario: {
           email,
           password: await usuariosModel.hashPassword(password),
           estado,
           tipo,
-        }
-      }
-    }
+        },
+      },
+    };
     const rslt = await this.collection.updateOne(filtro, updateCmd);
     return rslt;
   }
 
+  /**
+   * Método para insertar el usuario en la base de datos.
+   * @param {string} id ObjectId del usuario a verficar.
+   * @returns Object
+   */
+  crearUsuarioDocenteVerificable = async (id) => {
+    const filtro = { _id: ObjectId(id) };
+    const datosVerificacion = {
+      $set: {
+        verified: null,
+        verifyInfo: {
+          timestamp: new Date(),
+          verifyCode: seguridadModel.generarCodigoVerificacion(),
+        },
+      },
+    };
+    const seInsertoVerificacion = await this.collection.updateOne(
+      filtro,
+      datosVerificacion
+    );
+    return seInsertoVerificacion;
+  };
+
   // inactivar el usuario del docente
   async updateUserStatus(id, usuario) {
-    const filtro = { _id: new ObjectId(id) }
+    const filtro = { _id: new ObjectId(id) };
     const userStatus = {
-      "$set": {
-        "usuario.estado": "Inactivo"
-      }
+      $set: {
+        "usuario.estado": "Inactivo",
+      },
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
   }
 
   //activar el usuario del docente
   async updateUserStatusV(id, usuario) {
-    const filtro = { _id: new ObjectId(id) }
+    const filtro = { _id: new ObjectId(id) };
     const userStatus = {
-      "$set": {
-        "usuario.estado": "Activo"
-      }
+      $set: {
+        "usuario.estado": "Activo",
+      },
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
   }

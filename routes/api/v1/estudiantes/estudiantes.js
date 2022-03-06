@@ -79,4 +79,105 @@ router.put("/newencargado/:id", async (req, res) => {
   }
 }); // put: /newencargado
 
+//ACTUALIZAR INFORMACIÓN DEL ESTUDIANTE
+//Ruta para actualizar el estudiante
+router.put("/updateStudent/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      identidad,
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      genero,
+      telefono,
+      fotoPerfil,
+      direccion
+    } = req.body;
+
+    const result = await estudianteModel.updateStudent(
+      id,
+      identidad,
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      genero,
+      telefono,
+      fotoPerfil,
+      direccion
+    );
+    res.status(200).json({ status: "success", result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+}); // put: /updateStudent
+
+//Ruta para actualizar el usuario del estudiante
+router.put("/updateUserStudent/:id", async (req, res) => {
+  try {
+    const {
+      email,
+      password,
+      estado,
+      tipo
+    } = req.body;
+    const { id } = req.params;
+
+    const rslt = await estudianteModel.updateUserStudent(
+      id,
+      email,
+      password,
+      estado,
+      tipo
+      )
+    res.status(200).json({ "status": "ok" })
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ "status": "failed" })
+  }
+}) // put: /updateUserStudent
+
+//Ruta para actualizar la información del encargado
+router.put("/updateStudentManager/:id", async (req, res) => {
+  try {
+    const {
+      nombre,
+      apellido,
+      telefono,
+      email
+    } = req.body;
+    const { id } = req.params;
+
+    const result = await estudianteModel.newEncargadoEstudiante(
+      id,
+      nombre,
+      apellido,
+      telefono,
+      email
+    );
+    res.status(200).json({ status: "success", result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+}) // put: /updateStudentManager
+
+/**
+ * Ruta para cambiar el estado
+ */
+
+  router.put("/updatestatus/:id", async(req,res)=>{ 
+    try{
+      const {id} = req.params;
+      const rslt = await estudianteModel.updateUserStatus(id);
+      res.status(200).json({"status":"ok",rslt});
+    }catch(ex){
+      console.log(ex);
+      res.status(500).json({"status":"failed"})
+    }
+
+
+  })
+
 module.exports = router;
