@@ -58,8 +58,7 @@ router.put("/signin/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-});
-// post: /sigin
+}); // put: /sigin
 
 // Ruta para crear el encargado de un estudiante /signin
 router.put("/newencargado/:id", async (req, res) => {
@@ -78,7 +77,6 @@ router.put("/newencargado/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-});
-// post: /sigin
+}); // put: /newencargado
 
 module.exports = router;

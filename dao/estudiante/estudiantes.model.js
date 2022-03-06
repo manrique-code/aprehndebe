@@ -14,8 +14,8 @@ class Estudiantes {
         db = database;
         this.collection = db.collection("Estudiantes");
         this.collection.createIndex(
-          {identidad:1, email:1},
-          {unique: true}
+          { identidad: 1, email: 1 },
+          { unique: true }
         );
       })
       .catch((err) => {
@@ -35,16 +35,7 @@ class Estudiantes {
    * @returns Object
    */
 
-  async newEstudiante(
-    identidad,
-    nombres,
-    apellidos,
-    fechaNacimiento,
-    genero,
-    telefono,
-    fotoPerfil,
-    direccion
-  ) {
+  async newEstudiante(identidad, nombres, apellidos, fechaNacimiento, genero, telefono, fotoPerfil, direccion) {
     const estudiante = {
       identidad,
       nombres,
@@ -58,6 +49,7 @@ class Estudiantes {
     const resultado = await this.collection.insertOne(estudiante);
     return resultado;
   }
+
   /**
    * Método para crear el usuario a un estudiante.
    * @param {string} identidad Identidad de un usuario existente.
@@ -65,7 +57,8 @@ class Estudiantes {
    * @param {string} password Contraseña sin encriptar.
    * @returns Object
    */
-   async newUsuarioEstudiante(id, email, password) {
+
+  async newUsuarioEstudiante(id, email, password) {
     const filtro = { "_id": new ObjectId(id) };
     const usuarioEstudiante = {
       $set: {
@@ -88,7 +81,7 @@ class Estudiantes {
     const filtro = { "_id": new ObjectId(id) };
     const usuarioEstudiante = {
       $set: {
-        encargado:{
+        encargado: {
           nombre,
           apellido,
           telefono,
@@ -102,6 +95,7 @@ class Estudiantes {
     );
     return seCreoUsuario;
   }
+
 }
 
 module.exports = Estudiantes;

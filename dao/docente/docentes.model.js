@@ -86,20 +86,21 @@ class Docentes {
     );
     return seCreoUsuario;
   }
-  
+
   // Esta funcion permite al docente editar parcialmente sus datos personales,
   // no esta permitido que este cambie su identidad ya que son datos unicos requeridos
-   /**
-   * @param {string} identidad Número de identindad único del docente
-   * @param {string} nombres Nombre y segundo nombre del docente
-   * @param {string} apellidos Primer y segudo apellidio
-   * @param {string} fechaNacimiento YYYY-MM-DD
-   * @param {Array} titulosAcademicos Arreglo de títulos académicos
-   * @param {string} genero Genero
-   * @param {Array} telefono Arreglo de número telefónicos
-   * @param {Array} direccion Arreglo de direcciones
-   * @returns Object
-   */
+  /**
+  * @param {string} identidad Número de identidad único del docente
+  * @param {string} nombres Nombre y segundo nombre del docente
+  * @param {string} apellidos Primer y segudo apellidio
+  * @param {string} fechaNacimiento YYYY-MM-DD
+  * @param {Array} titulosAcademicos Arreglo de títulos académicos
+  * @param {string} genero Genero
+  * @param {Array} telefono Arreglo de número telefónicos
+  * @param {Array} direccion Arreglo de direcciones
+  * @returns Object
+  */
+
   async updateDocente(
     id,
     identidad,
@@ -110,10 +111,10 @@ class Docentes {
     genero,
     telefono,
     direccion
-  ){
-    const filter ={_id:new ObjectId(id)};
+  ) {
+    const filter = { _id: new ObjectId(id) };
     const updateCmd = {
-      "$set":{
+      "$set": {
         identidad,
         nombres,
         apellidos,
@@ -124,12 +125,12 @@ class Docentes {
         direccion
       }
     };
-    const rslt = await this.collection.updateOne(filter,updateCmd);
+    const rslt = await this.collection.updateOne(filter, updateCmd);
     return rslt;
 
   } /// update
 
-  // Actualizacion de ususarios de docentes
+  // Actualizacion de usuarios de docentes
   /**
    * 
    * @param {string} id Id de la coleccion de docente
@@ -139,27 +140,28 @@ class Docentes {
    * @param {string} password Contraseña sin encriptar.
    * @returns Object
    */
-  async updateUser(id, email, password,estado,tipo){
-    const filtro = {"_id": new ObjectId(id)};
+  async updateUser(id, email, password, estado, tipo) {
+    const filtro = { "_id": new ObjectId(id) };
     const updateCmd = {
-      "$set":{
-          "usuario":{
-            email,
-            password:await usuariosModel.hashPassword(password),
-            estado,
-            tipo,
-          }
+      "$set": {
+        "usuario": {
+          email,
+          password: await usuariosModel.hashPassword(password),
+          estado,
+          tipo,
+        }
       }
     }
-    const rslt = await this.collection.updateOne(filtro,updateCmd);
+    const rslt = await this.collection.updateOne(filtro, updateCmd);
     return rslt;
   }
+
   // inactivar el usuario del docente
   async updateUserStatus(id, usuario) {
-    const filtro = { _id: new ObjectId(id)}
+    const filtro = { _id: new ObjectId(id) }
     const userStatus = {
       "$set": {
-        "usuario.estado":"Inactivo"
+        "usuario.estado": "Inactivo"
       }
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
@@ -167,15 +169,14 @@ class Docentes {
 
   //activar el usuario del docente
   async updateUserStatusV(id, usuario) {
-    const filtro = { _id: new ObjectId(id)}
+    const filtro = { _id: new ObjectId(id) }
     const userStatus = {
       "$set": {
-        "usuario.estado":"Activo"
+        "usuario.estado": "Activo"
       }
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
   }
-
 }
 
 module.exports = Docentes;
