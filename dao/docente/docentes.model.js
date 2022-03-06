@@ -67,7 +67,6 @@ class Docentes {
    * @param {string} password Contraseña sin encriptar.
    * @returns Object
    */
-
   async newUsuarioDocente(id, email, password) {
     const filtro = { _id: ObjectId(id) };
     const usuarioDocente = {
@@ -95,9 +94,9 @@ class Docentes {
     return seCreoUsuario;
   }
 
-  // Esta funcion permite al docente editar parcialmente sus datos personales,
-  // no esta permitido que este cambie su identidad ya que son datos unicos requeridos
   /**
+   * Esta funcion permite al docente editar parcialmente sus datos personales
+   * no esta permitido que este cambie su identidad ya que son datos unicos requeridos
    * @param {string} identidad Número de identindad único del docente
    * @param {string} nombres Nombre y segundo nombre del docente
    * @param {string} apellidos Primer y segudo apellidio
@@ -136,9 +135,8 @@ class Docentes {
     return rslt;
   } /// update
 
-  // Actualizacion de ususarios de docentes
   /**
-   *
+   * Actualizacion de ususarios de docentes
    * @param {string} id Id de la coleccion de docente
    * @param {string} estado
    * @param {string} tipo
