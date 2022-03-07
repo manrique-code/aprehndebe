@@ -64,6 +64,18 @@ class Usuarios {
     const estaActivo = await db.collection(this.tipo).findOne(filtro, busqueda);
     return estaActivo?.usuario?.estado;
   };
+
+  /**
+   * Método para obtener el correo electrónico de un usuario.
+   * @param {string} idusuario ObjectId del usuario de quien queremos saber el email.
+   * @returns string
+   */
+  obtenerUsuarioEmail = async (idusuario) => {
+    const filtro = { _id: ObjectId(idusuario) };
+    const busqueda = { projection: { _id: false, "usuario.email": true } };
+    const email = await db.collection(this.tipo).findOne(filtro, busqueda);
+    return email?.usuario?.email;
+  };
 }
 
 module.exports = Usuarios;
