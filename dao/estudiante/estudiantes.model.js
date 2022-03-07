@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const { ObjectId } = require("mongodb");
 const getDb = require("../mongodb");
 const Usuarios = require("../seguridad/usuarios.model");
@@ -35,7 +34,16 @@ class Estudiantes {
    * @returns Object
    */
 
-  async newEstudiante(identidad, nombres, apellidos, fechaNacimiento, genero, telefono, fotoPerfil, direccion) {
+  async newEstudiante(
+    identidad,
+    nombres,
+    apellidos,
+    fechaNacimiento,
+    genero,
+    telefono,
+    fotoPerfil,
+    direccion
+  ) {
     const estudiante = {
       identidad,
       nombres,
@@ -59,7 +67,7 @@ class Estudiantes {
    */
 
   async newUsuarioEstudiante(id, email, password) {
-    const filtro = { "_id": new ObjectId(id) };
+    const filtro = { _id: new ObjectId(id) };
     const usuarioEstudiante = {
       $set: {
         usuario: {
@@ -78,15 +86,15 @@ class Estudiantes {
   }
 
   async newEncargadoEstudiante(id, nombre, apellido, telefono, email) {
-    const filtro = { "_id": new ObjectId(id) };
+    const filtro = { _id: new ObjectId(id) };
     const usuarioEstudiante = {
       $set: {
         encargado: {
           nombre,
           apellido,
           telefono,
-          email
-        }
+          email,
+        },
       },
     };
     const seCreoUsuario = await this.collection.updateOne(
@@ -96,66 +104,88 @@ class Estudiantes {
     return seCreoUsuario;
   }
 
-//ACTUALIZAR INFORMACIÓN DEL ESTUDIANTE
-async updateStudent(id, identidad, nombres, apellidos, fechaNacimiento, genero, telefono, fotoPerfil, direccion) {
-  const filter = { _id: new ObjectId(id) };
-  const updateCmd = {
-    "$set": {
-      identidad,
-      nombres,
-      apellidos,
-      fechaNacimiento,
-      genero,
-      telefono,
-      fotoPerfil,
-      direccion
-    }
+  /**
+   * Método para obtener el email del encargado de un estudiante.
+   * @param {string} idEstudiante ObjectId del estudiante del cual quiere obtener el correo del encargado.
+   * @returns string
+   */
+  obtenerMailEncargado = async (idEstudiante) => {
+    const filtro = { _id: new ObjectId(idEstudiante) };
+    const busqueda = { projection: { _id: false, "usuario.email": true } };
+    const result = this.collection.findOne(filtro, busqueda);
+    return result?.encargado?.email;
   };
-  const rslt = await this.collection.updateOne(filter, updateCmd);
-  return rslt;
-}
 
-async updateUserStudent(id, email, password, estado, tipo) {
-  const filtro = { "_id": new ObjectId(id) };
-  const updateCmd = {
-    "$set": {
-      "usuario": {
-        email,
-        password: await usuariosModel.hashPassword(password),
-        estado,
-        tipo,
-      }
-    }
-  }
-  const rslt = await this.collection.updateOne(filtro, updateCmd);
-  return rslt;
-}
-
-async updateStudentManager(id, nombre, apellido, telefono, email){
-  const filtro = { "_id": new ObjectId(id) };
-  const updateCmd = {
-    "$set": {
-      "encargado": {
-        nombre,
-        apellido,
+  //ACTUALIZAR INFORMACIÓN DEL ESTUDIANTE
+  async updateStudent(
+    id,
+    identidad,
+    nombres,
+    apellidos,
+    fechaNacimiento,
+    genero,
+    telefono,
+    fotoPerfil,
+    direccion
+  ) {
+    const filter = { _id: new ObjectId(id) };
+    const updateCmd = {
+      $set: {
+        identidad,
+        nombres,
+        apellidos,
+        fechaNacimiento,
+        genero,
         telefono,
-        email,
-      }
-    }
+        fotoPerfil,
+        direccion,
+      },
+    };
+    const rslt = await this.collection.updateOne(filter, updateCmd);
+    return rslt;
   }
-  const rslt = await this.collection.updateOne(filtro, updateCmd);
-  return rslt;
-}
+
+  async updateUserStudent(id, email, password, estado, tipo) {
+    const filtro = { _id: new ObjectId(id) };
+    const updateCmd = {
+      $set: {
+        usuario: {
+          email,
+          password: await usuariosModel.hashPassword(password),
+          estado,
+          tipo,
+        },
+      },
+    };
+    const rslt = await this.collection.updateOne(filtro, updateCmd);
+    return rslt;
+  }
+
+  async updateStudentManager(id, nombre, apellido, telefono, email) {
+    const filtro = { _id: new ObjectId(id) };
+    const updateCmd = {
+      $set: {
+        encargado: {
+          nombre,
+          apellido,
+          telefono,
+          email,
+        },
+      },
+    };
+    const rslt = await this.collection.updateOne(filtro, updateCmd);
+    return rslt;
+  }
 
   /**
    * metodo que resume dos modulos en uno, cambiando el estado de un estudiante
    * en una sola accion para optimizacion del proceso(CONSIDERAR ESTE METODO PARA DOCENTE)
-   * @param {String} id el unico parametro requerido es el objectID 
+   * @param {String} id el unico parametro requerido es el objectID
    */
   async updateUserStatus(id) {
     const filtro = { _id: new ObjectId(id) };
     const est = await this.collection.findOne(filtro);
-    let sta = (est.usuario.estado ==="Activo")? "Inactivo":"Activo";
+    let sta = est.usuario.estado === "Activo" ? "Inactivo" : "Activo";
     const userStatus = {
       $set: {
         "usuario.estado": sta,
@@ -163,17 +193,6 @@ async updateStudentManager(id, nombre, apellido, telefono, email){
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
   }
-
-  //habilitar el usuario de estudiante
-  // async updateUserActivate(id, usuario) {
-  //   const filtro = { _id: new ObjectId(id) };
-  //   const userStatus = {
-  //     $set: {
-  //       "usuario.estado": "Activo",
-  //     },
-  //   };
-  //   const rslt = await this.collection.updateOne(filtro, userStatus);
-  // }
 }
 
 module.exports = Estudiantes;
