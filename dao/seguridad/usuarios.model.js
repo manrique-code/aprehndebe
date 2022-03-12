@@ -35,6 +35,31 @@ class Usuarios {
   }
 
   /**
+   * Método para crear un usuario en la base de datos.
+   * @param {string} id ObjectId del usuario a crear el usuario.
+   * @param {string} email Dirección de email del usuario.
+   * @param {string} password Contraseña no hasheada del usuario
+   * @returns Object
+   */
+  crearUsuario = async (id, email, password) => {
+    const filtro = { _id: ObjectId(id) };
+    const payloadUsuario = {
+      $set: {
+        usuario: {
+          email,
+          password: await this.hashPassword(password),
+          estado: "Activo",
+          tipo: this.tipo,
+        },
+      },
+    };
+    const usuarioCreado = await db
+      .collection(this.tipo)
+      .updateOne(filtro, payloadUsuario);
+    return usuarioCreado;
+  };
+
+  /**
    * Método para verificar si una dirección de correo electrónico existe en la base de datos.
    * @param {string} email Dirección de correo electrónico del email a buscar
    * @returns string
