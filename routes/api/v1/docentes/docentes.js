@@ -18,6 +18,28 @@ router.get("/", (req, res) => {
   }
 }); // get: /
 
+router.get("/userbyid/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await usuarioModel.obtenerUsuarioPorId(id);
+    res.status(200).json({ status: "success", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
+router.get("/userbyemail/:email", async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await usuarioModel.obtenerUsuarioPorEmail(email);
+    res.status(200).json({ status: "success", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
 // Ruta para crear un docente: post /new
 router.post("/new", async (req, res) => {
   try {
