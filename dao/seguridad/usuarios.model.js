@@ -76,6 +76,34 @@ class Usuarios {
     const email = await db.collection(this.tipo).findOne(filtro, busqueda);
     return email?.usuario?.email;
   };
+
+  obtenerUsuarioPorId = async (id) => {
+    const filtro = { _id: ObjectId(id) };
+    const usuario = await db.collection(this.tipo).findOne(filtro);
+    return usuario;
+  };
+
+  /**
+   * Método para obtener la información del usuario a través de su email.
+   * @param {string} email Dirección de correo electrónico del usuario.
+   * @returns Object
+   */
+  obtenerUsuarioPorEmail = async (email) => {
+    const filtro = { "usuario.email": email };
+    const usuario = await db.collection(this.tipo).findOne(filtro);
+    return usuario;
+  };
+
+  /**
+   * Método para obtener información del usuario a través de su identidad.
+   * @param {string} identidad Identidad del usuario.
+   * @returns Object
+   */
+  obtenerUsuarioPorIdentidad = async (identidad) => {
+    const filtro = { identidad };
+    const usuario = await db.collection(this.tipo).findOne(filtro);
+    return usuario;
+  };
 }
 
 module.exports = Usuarios;
