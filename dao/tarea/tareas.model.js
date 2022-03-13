@@ -33,7 +33,7 @@ class Tareas {
     const tiempo = Date.now()
     const hoy = new Date(tiempo)
   
-    const numeroTarea = "HW"+hoy.getDate()+"_"+(hoy.getMonth()-1)+"_"+hoy.getMilliseconds();
+    const numeroTarea = "HW"+hoy.getDate()+"_"+(hoy.getMonth()+1)+"_"+hoy.getMilliseconds();
     const tareaCmd = {
       $push: {
         tareaAsignada: {
