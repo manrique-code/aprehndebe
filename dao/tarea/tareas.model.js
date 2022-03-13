@@ -29,8 +29,11 @@ class Tareas {
    */
   async newTarea(id, fechaAsignada, fechaEntrega, estado, info) {
     const filter = { _id: new ObjectId(id) };
-    const tareas = await this.collection.findOne(filter);
-    const numeroTarea = tareas.tareaAsignada.length + 1;
+
+    const tiempo = Date.now()
+    const hoy = new Date(tiempo)
+  
+    const numeroTarea = "HW"+hoy.getDate()+"_"+(hoy.getMonth()-1)+"_"+hoy.getMilliseconds();
     const tareaCmd = {
       $push: {
         tareaAsignada: {
@@ -93,6 +96,10 @@ class Tareas {
     const tareas = await this.collection.findOne(filter);
     return tareas.tareaAsignada;
   }
+
+  // async updateEstadoTarea(id,numeroTarea,estado){
+
+  // }
 }
 
 module.exports = Tareas;
