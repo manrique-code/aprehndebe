@@ -85,6 +85,20 @@ router.put("/updateentregable/:iddoc/:idest", async(req,res)=>{
     }
 });
 
+//router delete tarea()
+router.delete('/deleteTarea/:id/:idtarea', async (req, res) => {
+    try {
+      const { id, idtarea } = req.params;
+      const result = await tareasModel.deleteTarea(id, idtarea);
+      res.status(200).json({
+        status: 'ok',
+        result
+      });
+    } catch (ex) {
+      console.log(ex);
+      res.status(500).json({ status: 'failed' });
+    }
+  });
 
 
 module.exports = router;

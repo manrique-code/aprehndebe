@@ -100,6 +100,16 @@ class Tareas {
   // async updateEstadoTarea(id,numeroTarea,estado){
 
   // }
+
+  // eliminar tarea
+  async deleteTarea(id, numeroTarea){
+    const filter = { _id: new ObjectId(id)};
+    const updateCmd = {
+      $pull:{"tareaAsignada": {"numeroTarea":{$in:[numeroTarea]}}}
+    }
+    const rslt = await this.collection.updateOne(filter, updateCmd);
+    return rslt;
+  }
 }
 
 module.exports = Tareas;
