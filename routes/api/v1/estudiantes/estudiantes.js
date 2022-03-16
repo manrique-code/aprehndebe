@@ -2,6 +2,12 @@ const express = require("express");
 const router = express.Router();
 const Estudiante = require("../../../../dao/estudiante/estudiantes.model");
 const estudianteModel = new Estudiante();
+const Matricula = require("../../../../dao/matricula/matriculas.model");
+const matriculaModel = new Matricula();
+const Tareas = require("../../../../dao/tarea/tareas.model");
+const tareasModel = new Tareas();
+const Usuario = require("../../../../dao/seguridad/usuarios.model");
+const usuarioModel = new Usuario("Estudiantes");
 
 router.get("/", (req, res) => {
   try {
@@ -124,7 +130,7 @@ router.put("/updateStudent/:id", async (req, res) => {
       genero,
       telefono,
       fotoPerfil,
-      direccion
+      direccion,
     } = req.body;
 
     const result = await estudianteModel.updateStudent(
@@ -148,12 +154,7 @@ router.put("/updateStudent/:id", async (req, res) => {
 //Ruta para actualizar el usuario del estudiante
 router.put("/updateUserStudent/:id", async (req, res) => {
   try {
-    const {
-      email,
-      password,
-      estado,
-      tipo
-    } = req.body;
+    const { email, password, estado, tipo } = req.body;
     const { id } = req.params;
 
     const rslt = await estudianteModel.updateUserStudent(
@@ -162,23 +163,18 @@ router.put("/updateUserStudent/:id", async (req, res) => {
       password,
       estado,
       tipo
-      )
-    res.status(200).json({ "status": "ok" })
+    );
+    res.status(200).json({ status: "ok" });
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ "status": "failed" })
+    res.status(500).json({ status: "failed" });
   }
-}) // put: /updateUserStudent
+}); // put: /updateUserStudent
 
 //Ruta para actualizar la información del encargado
 router.put("/updateStudentManager/:id", async (req, res) => {
   try {
-    const {
-      nombre,
-      apellido,
-      telefono,
-      email
-    } = req.body;
+    const { nombre, apellido, telefono, email } = req.body;
     const { id } = req.params;
 
     const result = await estudianteModel.newEncargadoEstudiante(
@@ -193,23 +189,51 @@ router.put("/updateStudentManager/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ status: "failed" });
   }
-}) // put: /updateStudentManager
+}); // put: /updateStudentManager
 
 /**
  * Ruta para cambiar el estado
  */
+router.put("/updatestatus/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rslt = await estudianteModel.updateUserStatus(id);
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+});
 
-  router.put("/updatestatus/:id", async(req,res)=>{ 
-    try{
-      const {id} = req.params;
-      const rslt = await estudianteModel.updateUserStatus(id);
-      res.status(200).json({"status":"ok",rslt});
-    }catch(ex){
-      console.log(ex);
-      res.status(500).json({"status":"failed"})
-    }
+/**
+ * Ruta para obtener todas las notas de todas las clases a las cuales está matriculado un estudiante
+ */
+router.get("/notas/:idEstudiante", async (req, res) => {
+  const { idEstudiante } = req.params;
+  try {
+    const payload = await matriculaModel.verTodasNotasEstudiante(idEstudiante);
+    res.status(200).json({ status: "success", payload });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+}); // get: /notas/:idestudiante
 
-
-  })
+/**
+ * Ruta para obtener la nota de una sola clase a la cual está matriculado el estudiante
+ */
+router.get("/nota-by-clase/:idEstudiante/:idClase", async (req, res) => {
+  const { idEstudiante, idClase } = req.params;
+  try {
+    const payload = await matriculaModel.verNotaClaseEstudiante(
+      idEstudiante,
+      idClase
+    );
+    res.status(200).json({ status: "success", payload });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+}); // get: /nota-by-clase/:idEstudiante/:idClase
 
 module.exports = router;
