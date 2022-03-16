@@ -47,7 +47,7 @@ class Clases {
    * @param {*} horario
    * @returns
    */
-  aperturarClase = async (idDocente, nombre, horario) => {
+  aperturarClase = async (idDocente, nombre, horario, timestamp) => {
     const clase = {
       nombre,
       docente: ObjectId(idDocente),

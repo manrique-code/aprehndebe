@@ -84,12 +84,12 @@ class Docentes {
       usuarioDocente
     );
 
-    if (process.env.MIGRATE === "true") {
-      const index = this.collection.createIndex(
-        { "usuario.email": 1 },
-        { unique: true }
-      );
-    }
+    // if (process.env.MIGRATE === "true") {
+    //   const index = this.collection.createIndex(
+    //     { "usuario.email": 1 },
+    //     { unique: true }
+    //   );
+    // }
 
     return seCreoUsuario;
   }
@@ -165,13 +165,13 @@ class Docentes {
    * @param {string} id ObjectId del usuario a verficar.
    * @returns Object
    */
-  crearUsuarioDocenteVerificable = async (id) => {
+  crearUsuarioDocenteVerificable = async (id, timestamp) => {
     const filtro = { _id: ObjectId(id) };
     const datosVerificacion = {
       $set: {
         verified: null,
         verifyInfo: {
-          timestamp: new Date(),
+          timestamp: new Date(timestamp),
           verifyCode: seguridadModel.generarCodigoVerificacion(),
         },
       },
