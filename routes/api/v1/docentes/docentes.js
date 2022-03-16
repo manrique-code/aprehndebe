@@ -162,7 +162,7 @@ router.get("/c/:token", async (req, res) => {
  */
 router.post("/login", async (req, res) => {
   let notificarMail = null;
-  const { email, password } = req.body;
+  const { email, password, timestamp } = req.body;
   try {
     const existeMail = await usuarioModel.encontrarPorEmail(email);
     if (existeMail) {
@@ -189,7 +189,7 @@ router.post("/login", async (req, res) => {
               "Inicio de sesión",
               `Han iniciado sesión desde ${req.get(
                 "User-Agent"
-              )} el ${new Date()}`
+              )} el ${timestamp}`
             );
           }
           res.status(200).json({ status: "success", payload, notificarMail });
