@@ -60,6 +60,38 @@ router.put("/signin/:id", async (req, res) => {
   }
 }); // put: /sigin
 
+/**
+ * Ruta para que el estudiante inicie sesión con su usuario.
+ */
+router.post("/login", async (req, res) => {
+  const { email, password, timestamp } = req.body;
+  let usuario = null;
+  let mail = null;
+  try {
+    usuario = await usuarioModel.obtenerUsuarioPorEmail(email);
+    if (usuario) {
+      const tareas = await tareasModel.obtenerTiempoFaltanteTareaTodasClases(
+        usuario?._id
+      );
+      const segundos = await tareasModel.getSecondsLeftHomework(
+        tareas?.tareasAsignadas
+      );
+      console.log(tareas);
+      res.status(200).json({ status: "success" });
+    }
+    // 070: El usuario no existe en la base de datos.
+    else
+      res.status(400).json({
+        status: "failed",
+        msg: "Error al iniciar sesión. Por favor, intentalo más tarde.",
+        error: 070,
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
 // Ruta para crear el encargado de un estudiante /signin
 router.put("/newencargado/:id", async (req, res) => {
   try {
