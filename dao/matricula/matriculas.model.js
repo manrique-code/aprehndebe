@@ -19,11 +19,11 @@ class Matricula {
    * @param {string} idEstudiante ObjectId del estudiante a ser matriculado.
    * @returns Object
    */
-  matricularClase = async (claseId, estudianteId) => {
+  matricularClase = async (claseId, estudianteId, timestampMatricula) => {
     const payload = {
       idClase: new ObjectId(claseId),
       idEstudiante: new ObjectId(estudianteId),
-      timestampMatricula: new Date(),
+      timestampMatricula: new Date(timestampMatricula),
       infoEstudiante: {
         notas: [],
         estado: null,
