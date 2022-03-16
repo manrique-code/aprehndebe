@@ -67,7 +67,8 @@ router.post("/matricula/:idEstudiante", async (req, res) => {
       if (estado === "MATRICULA") {
         const matricula = await matriculaModel.matricularClase(
           _id,
-          idEstudiante
+          idEstudiante,
+          timestamp
         );
         if (matricula) {
           mailEstudiante = await mailSender.enviarEmailTextoPlano(
