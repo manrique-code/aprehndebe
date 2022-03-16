@@ -1,14 +1,17 @@
 const ObjectId = require("mongodb").ObjectId;
+const { differenceInSeconds, addDays } = require("date-fns");
 const getDb = require("../mongodb");
 let db = null;
 
 class Tareas {
   collection = null;
+  matriculaCollection = null;
   constructor() {
     getDb()
       .then((database) => {
         db = database;
         this.collection = db.collection("Clases");
+        this.matriculaCollection = db.collection("Matriculas");
         if (process.env.MIGRATE === "true") {
           // AUN NO SE REQUIERE NADA.
         }
@@ -30,10 +33,16 @@ class Tareas {
   async newTarea(id, fechaAsignada, fechaEntrega, estado, info) {
     const filter = { _id: new ObjectId(id) };
 
-    const tiempo = Date.now()
-    const hoy = new Date(tiempo)
-  
-    const numeroTarea = "HW"+hoy.getDate()+"_"+(hoy.getMonth()+1)+"_"+hoy.getMilliseconds();
+    const tiempo = Date.now();
+    const hoy = new Date(tiempo);
+
+    const numeroTarea =
+      "HW" +
+      hoy.getDate() +
+      "_" +
+      (hoy.getMonth() + 1) +
+      "_" +
+      hoy.getMilliseconds();
     const tareaCmd = {
       $push: {
         tareaAsignada: {
@@ -102,14 +111,61 @@ class Tareas {
   // }
 
   // eliminar tarea
-  async deleteTarea(id, numeroTarea){
-    const filter = { _id: new ObjectId(id)};
+  async deleteTarea(id, numeroTarea) {
+    const filter = { _id: new ObjectId(id) };
     const updateCmd = {
-      $pull:{"tareaAsignada": {"numeroTarea":{$in:[numeroTarea]}}}
-    }
+      $pull: { tareaAsignada: { numeroTarea: { $in: [numeroTarea] } } },
+    };
     const rslt = await this.collection.updateOne(filter, updateCmd);
     return rslt;
   }
+  getSecondsLeftHomework = async (tareas) => {
+    console.log(tareas);
+    const segundosFaltantes = tareas.map(async (tarea) => {
+      return `Esta es la tarea => ${tarea?.numeroTarea}`;
+    });
+    return segundosFaltantes;
+  };
+
+  // Tratando de resolver problem asíncrono de obtener los segundo restantes de un tarea con una función map
+  // https://javascript.plainenglish.io/using-asynchronous-operations-with-javascripts-array-map-method-1971e8093228
+  obtenerTiempoFaltanteTareaTodasClases = async (idEstudiante) => {
+    const pipeline = [
+      {
+        $match: {
+          idEstudiante: new ObjectId(idEstudiante),
+        },
+      },
+      {
+        $lookup: {
+          from: "Clases",
+          localField: "idClase",
+          foreignField: "_id",
+          as: "clase",
+        },
+      },
+      {
+        $project: {
+          clase: 1,
+          infoEstudiante: 1,
+        },
+      },
+      {
+        $sort: {
+          "clase.0.nombre": 1,
+        },
+      },
+    ];
+    const resultado = await this.matriculaCollection
+      .aggregate(pipeline)
+      .toArray();
+    const tareas = resultado.map((infoClase, index, clases) => {
+      const nombreClase = infoClase?.clase[0]?.nombre;
+      const tareasAsignadas = infoClase?.clase[0]?.tareaAsignada;
+      return { nombreClase, tareasAsignadas };
+    });
+    return { tareas };
+  };
 }
 
 module.exports = Tareas;
