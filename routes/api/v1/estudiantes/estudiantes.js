@@ -23,7 +23,7 @@ router.post("/new", async (req, res) => {
       genero,
       telefono,
       fotoPerfil,
-      direccion
+      direccion,
     } = req.body;
     const result = await estudianteModel.newEstudiante(
       identidad,

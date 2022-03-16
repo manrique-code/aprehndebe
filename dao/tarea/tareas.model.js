@@ -22,7 +22,7 @@ class Tareas {
   }
 
   /**
-   * CREAR METODO PARA INSERTAR CLASES
+   * Método para crear la tarea de una clase.
    * @param {String} id Identificador de la clases
    * @param {String} fechaAsignada fecha en la que se asigna la tarea
    * @param {String} fechaEntrega fecha limite para la entrega de la tarea

@@ -210,7 +210,7 @@ router.post("/login", async (req, res) => {
           error: 075,
         });
     }
-    // No existe el correo electrónico en la base de datos.
+    // 070: No existe el correo electrónico en la base de datos.
     else
       res.status(500).json({
         status: "failed",
