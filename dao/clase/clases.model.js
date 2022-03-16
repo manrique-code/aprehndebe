@@ -55,9 +55,11 @@ class Clases {
       codigo: this.generarCodigoClase(nombre, horario.hora[0]),
       horario,
       estado: "MATRICULA",
+      tareaAsignada: [],
+      timestamp: new Date(timestamp),
     };
     const claseCreada = await this.collection.insertOne(clase);
-    return claseCreada;
+    return { claseCreada, claseNombre: clase?.nombre, fecha: clase?.timestamp };
   };
 
   /**
@@ -104,22 +106,6 @@ class Clases {
     const busqueda = { projection: { _id: false, estado: true } };
     const { estado } = await this.collection.findOne(filtro, busqueda);
     return estado === "MATRICULA";
-  };
-
-  /**
-   * Método para matricular un estudiante en una clase.
-   * @param {string} idClase ObjectId de la clase a ser matriculada.
-   * @param {string} idEstudiante ObjectId del estudiante a ser matriculado.
-   * @returns Object
-   */
-  matricularClase = async (claseId, estudianteId) => {
-    const payload = {
-      idClase: new ObjectId(claseId),
-      idEstudiante: new ObjectId(estudianteId),
-      tareaEntregable: [],
-    };
-    const matricula = await this.collection.insertOne(payload);
-    return matricula;
   };
 
   /**
