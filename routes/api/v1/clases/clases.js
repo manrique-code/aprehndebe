@@ -8,6 +8,7 @@ const Mail = require("../../../../dao/mail/mailSender");
 const mailSender = new Mail();
 const Usuario = require("../../../../dao/seguridad/usuarios.model");
 const usuarioEstudiante = new Usuario("Estudiantes");
+const usuarioDocente = new Usuario("Docentes");
 const Matricula = require("../../../../dao/matricula/matriculas.model");
 const matriculaModel = new Matricula();
 
@@ -23,7 +24,9 @@ router.get("/", (req, res) => {
  * Enrutador para crear una nueva clase.
  */
 router.post("/new/:idDocente", async (req, res) => {
-  const { nombre, horario } = req.body;
+  let mailDocente = null;
+  let mail = null;
+  const { nombre, horario, timestamp } = req.body;
   const { idDocente } = req.params;
   try {
     const existeClase = await claseModel.verificarClaseDocente(
@@ -31,9 +34,20 @@ router.post("/new/:idDocente", async (req, res) => {
       nombre
     );
     if (!existeClase) {
-      const clase = await claseModel.aperturarClase(idDocente, nombre, horario);
+      const clase = await claseModel.aperturarClase(
+        idDocente,
+        nombre,
+        horario,
+        timestamp
+      );
+      mailDocente = await usuarioDocente.obtenerUsuarioEmail(idDocente);
       if (clase) {
-        res.status(201).json({ status: "success", clase });
+        mail = await mailSender.enviarEmailTextoPlano(
+          mailDocente,
+          "¡Clase creada correctamente!",
+          `Acabás de crear la clase ${clase?.claseNombre}\nAprehnde. ¡Nunca parés de educar el futuro de nuestro país!`
+        );
+        res.status(201).json({ status: "success", clase, mail });
       }
     }
     // Ya existe una clase con ese nombre.
@@ -52,7 +66,7 @@ router.post("/new/:idDocente", async (req, res) => {
 router.post("/matricula/:idEstudiante", async (req, res) => {
   let mailEstudiante = null;
   let mailEncargado = null;
-  const { codigoClase } = req.body;
+  const { codigoClase, timestamp } = req.body;
   const { idEstudiante } = req.params;
   try {
     const clase = await claseModel.obtenerClasePorCodigo(codigoClase);
