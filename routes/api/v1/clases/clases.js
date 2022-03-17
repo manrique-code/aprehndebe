@@ -57,7 +57,10 @@ router.post("/new/:idDocente", async (req, res) => {
         msg: "Ya tenés registrada una clase con ese nombre.",
         error: 101,
       });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error de ruta", error);
+    res.status(500).json({ status: "failed" });
+  }
 }); // post: /new/:idDocente
 
 /**
@@ -125,5 +128,24 @@ router.post("/matricula/:idEstudiante", async (req, res) => {
     res.status(500).json({ status: "failed" });
   }
 }); // post: /matricula/:idEstudiante
+
+/**
+ * Ruta para ver el listado de estudiantes por una clase
+ */
+router.get("/listado/:clase", async (req, res) => {
+  const { clase } = req.params;
+  const { pages, items } = req.body;
+  try {
+    const listado = await matriculaModel.obtenerListadoEstudiantePorClase(
+      clase,
+      items,
+      pages
+    );
+    res.status(200).json({ status: "success", listado });
+  } catch (error) {
+    console.error("Error al momento de obtener el listado", error);
+    res.status(500).json({ status: "failed" });
+  }
+}); // get: /listado/:clase
 
 module.exports = router;
