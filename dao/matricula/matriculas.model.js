@@ -147,5 +147,90 @@ class Matricula {
     });
     return infoEstudiante;
   };
+
+  /**
+   * Método para obtener el listado de estudiantes de una clase.
+   * @param {string} idClase ObjectId de la clase de la cual se quiere saber el listado
+   * @param {int} cantEstudiantes Cantidad de estudiantes en una página
+   * @param {int} paginas Páginas de resultado.
+   * @returns Promise: Object
+   */
+  obtenerListadoEstudiantePorClase = async (
+    idClase,
+    cantEstudiantes,
+    paginas
+  ) => {
+    const countPipeLine = [
+      {
+        $match: {
+          idClase: new ObjectId(idClase),
+        },
+      },
+      { $count: "cantidadEstudiantes" },
+    ];
+    const pipeline = [
+      {
+        $match: {
+          idClase: new ObjectId(idClase),
+        },
+      },
+      {
+        $skip: parseInt((paginas - 1) * cantEstudiantes),
+      },
+      {
+        $limit: parseInt(cantEstudiantes),
+      },
+      {
+        $group: {
+          _id: "$idClase",
+          idEstudiante: {
+            $addToSet: "$idEstudiante",
+          },
+          totalEstudiantes: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "Clases",
+          localField: "_id",
+          foreignField: "_id",
+          as: "Clases",
+        },
+      },
+      {
+        $lookup: {
+          from: "Estudiantes",
+          localField: "idEstudiante",
+          foreignField: "_id",
+          as: "Estudiantes",
+        },
+      },
+      {
+        $project: {
+          idEstudiante: 0,
+          _id: 0,
+        },
+      },
+    ];
+    const result = await this.collection.aggregate(pipeline).toArray();
+    const cantidadEstudiantes = await this.collection
+      .aggregate(countPipeLine)
+      .toArray();
+    const listados = result.map((listado) => {
+      const nombreClase = listado?.Clases[0]?.nombre;
+      const estudiantes = listado?.Estudiantes.map((estudiante) => ({
+        _id: estudiante?._id,
+        identidad: estudiante?.identidad,
+        nombreCompleto: `${estudiante?.nombres} ${estudiante?.apellidos}`,
+      }));
+      return {
+        nombreClase,
+        ...cantidadEstudiantes[0],
+        mostrando: listado?.totalEstudiantes,
+        estudiantes,
+      };
+    });
+    return listados;
+  };
 }
 module.exports = Matricula;

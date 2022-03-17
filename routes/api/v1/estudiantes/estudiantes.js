@@ -20,7 +20,6 @@ router.get("/", (req, res) => {
 // Ruta para crear un estudiante: post /new
 router.post("/new", async (req, res) => {
   try {
-    console.log(req.body);
     const {
       identidad,
       nombres,
