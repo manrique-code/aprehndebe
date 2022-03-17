@@ -127,6 +127,29 @@ class Clases {
     }
     return hora;
   };
+
+  // crear Anuncio
+ async newAnuncio(id, fecha, descripcion) {
+  const filtro = { _id: ObjectId(id) };
+  const updateCmd = {
+    $push: {
+      anuncio: {
+        fecha,
+        descripcion
+      },
+    },
+  };
+  const rslt = await this.collection.updateOne(filtro,updateCmd);
+    return rslt;
+};
+
+async obtenerAnunciosPorClase(id){
+  const filtro = { _id: ObjectId(id) };
+  const busqueda = {projection:{_id: 0, anuncio : 1}};
+
+  const rslt = await this.collection.findOne(filtro,busqueda);
+  return rslt;
+}
 }
 
 module.exports = Clases;

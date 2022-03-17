@@ -10,6 +10,7 @@ const Usuario = require("../../../../dao/seguridad/usuarios.model");
 const usuarioEstudiante = new Usuario("Estudiantes");
 const usuarioDocente = new Usuario("Docentes");
 const Matricula = require("../../../../dao/matricula/matriculas.model");
+const { assign } = require("nodemailer/lib/shared");
 const matriculaModel = new Matricula();
 
 router.get("/", (req, res) => {
@@ -126,4 +127,35 @@ router.post("/matricula/:idEstudiante", async (req, res) => {
   }
 }); // post: /matricula/:idEstudiante
 
+//Ruta para actualizar el anuncio del docentes,
+router.put("/newanuncio/:id", async (req, res) => {
+  try {
+    const { fecha, descripcion } = req.body;
+    const { id } = req.params;
+
+    const rslt = await claseModel.newAnuncio(
+      id,
+      fecha,
+	    descripcion
+    );
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+}); //Fin de la ruta de anuncio
+
+//ver listado de anuncios
+router.get("/anuncios/:id", async(req, res) => {
+  const {id} = req.params;
+  try {
+    const rslt = await claseModel.obtenerAnunciosPorClase(
+      id
+    );
+    res.status(200).json({ status: "ok", rslt });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: "failed" });
+  }
+});
 module.exports = router;
