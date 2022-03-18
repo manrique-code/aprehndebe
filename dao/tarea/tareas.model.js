@@ -166,6 +166,32 @@ class Tareas {
     });
     return { tareas };
   };
+  /**
+   * Este metodo permite al docente realizar una consulta de las tareas de un alumno de su clase
+   * @param {String} idClase Identificador del la clase
+   * @param {String} idEstudiante identificador del alumno que cursa la clase
+   * @returns array
+   */
+  verTareasClaseEstudiante = async(idClase,idEstudiante)=>{
+    const pipeline =[
+      {
+        $match: 
+        {
+          idClase: ObjectId(idClase),
+          idEstudiante: ObjectId(idEstudiante)
+        }
+      }, 
+      {
+        $project: 
+        {
+          tareaEntregable: 1
+        }
+      }
+    ]
+    const rslt =  await this.matriculaCollection.aggregate(pipeline).toArray()
+    const entregables = rslt[0].tareaEntregable
+    return entregables;
+  }
 }
 
 module.exports = Tareas;

@@ -63,35 +63,18 @@ router.put("/updateTarea/:id", async (req, res) => {
   }
 });
 
-router.put("/newentregable/:iddoc/:idest", async (req, res) => {
+// RUTA PARA CREAR UN ENTREGABLE
+router.put("/newentregable/:idclas/:idest", async (req, res) => {
   try {
-    const { iddoc, idest } = req.params;
-    const { numeroTarea, documentoURL, estado } = req.body;
-    const tiempoTranscurrido = Date.now();
-    const hoy = new Date(tiempoTranscurrido);
-
-    const fechaEntrega =
-      hoy.getDate() +
-      "-" +
-      (hoy.getMonth() + 1) +
-      "-" +
-      hoy.getFullYear() +
-      " " +
-      hoy.getHours() +
-      ":" +
-      hoy.getMinutes() +
-      ":" +
-      hoy.getSeconds() +
-      ":" +
-      hoy.getMilliseconds();
+    const { idclas, idest } = req.params;
+    const { numeroTarea, documentoURL, estado,fechaEntrega } = req.body;
 
     const rslt = await entregablesModel.newEntrega(
-      iddoc,
+      idclas,
       idest,
       numeroTarea,
       fechaEntrega,
       documentoURL,
-      estado
     );
     res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
@@ -100,30 +83,13 @@ router.put("/newentregable/:iddoc/:idest", async (req, res) => {
   }
 });
 
-router.put("/updateentregable/:iddoc/:idest", async (req, res) => {
+router.put("/updateentregable/:idclas/:idest", async (req, res) => {
   try {
-    const { iddoc, idest } = req.params;
-    const { numeroTarea, documentoURL, estado } = req.body;
-    const tiempoTranscurrido = Date.now();
-    const hoy = new Date(tiempoTranscurrido);
-
-    const fechaEntrega =
-      hoy.getDate() +
-      "-" +
-      (hoy.getMonth() + 1) +
-      "-" +
-      hoy.getFullYear() +
-      " " +
-      hoy.getHours() +
-      ":" +
-      hoy.getMinutes() +
-      ":" +
-      hoy.getSeconds() +
-      ":" +
-      hoy.getMilliseconds();
-
+    const { idclas, idest } = req.params;
+    const { numeroTarea, documentoURL, estado,fechaEntrega} = req.body;
+    
     const rslt = await entregablesModel.updateEntrega(
-      iddoc,
+      idclas,
       idest,
       numeroTarea,
       fechaEntrega,
@@ -151,5 +117,17 @@ router.delete("/deleteTarea/:id/:idtarea", async (req, res) => {
     res.status(500).json({ status: "failed" });
   }
 });
+
+//router para obtener las tareas pendientes por estudiante
+router.get("/tareasest/:idclas/:idest", async(req,res)=>{
+  try {
+    const {idest,idclas} = req.params;
+    const rslt = await tareasModel.verTareasClaseEstudiante(idclas,idest);
+    res.status(200).json({status:"ok",rslt})
+  } catch (error) {
+    res.status(500).json({ status: "failed" });
+    console.log(error);
+  }
+})
 
 module.exports = router;
