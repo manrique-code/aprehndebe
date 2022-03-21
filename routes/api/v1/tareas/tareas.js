@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Tareas = require("../../../../dao/tarea/tareas.model");
+const TareasEntregable = require("../../../../dao/tarea/tareasEntreg.model");
 const Entregables = require("../../../../dao/tarea/tareasEntreg.model");
 const tareasModel = new Tareas();
 const entregablesModel = new Entregables();
@@ -123,6 +124,19 @@ router.get("/tareasest/:idclas/:idest", async(req,res)=>{
   try {
     const {idest,idclas} = req.params;
     const rslt = await tareasModel.verTareasClaseEstudiante(idclas,idest);
+    res.status(200).json({status:"ok",rslt})
+  } catch (error) {
+    res.status(500).json({ status: "failed" });
+    console.log(error);
+  }
+})
+
+//router para insertar puntaje
+router.put("/evaluartarea/:idclas/:idest", async(req,res)=>{
+  try {
+    const {idest,idclas} = req.params;
+    const {numeroTarea,puntaje} = req.body;
+    const rslt = await entregablesModel.newEvaluacion(idclas,idest,numeroTarea,puntaje);
     res.status(200).json({status:"ok",rslt})
   } catch (error) {
     res.status(500).json({ status: "failed" });
