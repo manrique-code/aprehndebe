@@ -136,7 +136,7 @@ class Docentes {
   } /// update
 
   /**
-   * Actualizacion de ususarios de docentes
+   * Actualizacion de usuarios de docentes
    * @param {string} id Id de la coleccion de docente
    * @param {string} estado
    * @param {string} tipo
@@ -203,6 +203,45 @@ class Docentes {
       },
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
+  }
+
+    // Metodo para cambiar la contraseña del docente
+  /**
+   * 
+   * @param {String} id usuario del docente 
+   * @param {String} currentPassword contraseña actual 
+   * @param {String} newPassword contraseña nueva
+   * @returns Object
+   */
+   async updateUserPassword(id, currentPassword, newPassword) {
+    const filtro = { _id: new ObjectId(id) };
+    const passCmd = [
+      {
+        '$match': {
+          '_id': new ObjectId(id)
+        }
+      }, {
+        '$project': {
+          'usuario.password': 1
+        }
+      }
+    ]
+    const dbPassword = await this.collection.aggregate(passCmd).toArray()
+    const passDb = dbPassword[0].usuario.password
+
+    const validate = await usuariosModel.comparePassword(currentPassword, passDb)
+
+    if(validate) {
+      const updateCmd = {
+        $set: {
+          "usuario.password": await usuariosModel.hashPassword(newPassword)
+        },
+      };
+      const rslt = await this.collection.updateOne(filtro, updateCmd);
+      return rslt;
+    } else{
+      return "Error"
+    }
   }
 }
 

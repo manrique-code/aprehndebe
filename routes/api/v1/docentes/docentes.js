@@ -245,7 +245,7 @@ router.put("/updateuser/:identidad", async (req, res) => {
 // post: /sigin
 
 // Ruta para desactivar el usuario de un docente
-router.put("/editUserStatus/:id", async (req, res) => {
+router.put("/edituserstatus/:id", async (req, res) => {
   try {
     const { usuario } = req.body;
     const { id } = req.params;
@@ -261,7 +261,7 @@ router.put("/editUserStatus/:id", async (req, res) => {
 });
 
 //Ruta para activar el usuario de un docente
-router.put("/editUserStatusV/:id", async (req, res) => {
+router.put("/edituserstatusv/:id", async (req, res) => {
   try {
     const { usuario } = req.body;
     const { id } = req.params;
@@ -275,5 +275,21 @@ router.put("/editUserStatusV/:id", async (req, res) => {
     res.status(500).json({ status: "failed" });
   }
 });
+
+//Ruta para cambiar la contraseña del docente
+router.put("/editpassword/:id", async (req, res) =>{
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const { id } = req.params;
+    const result = await docenteModel.updateUserPassword(id, currentPassword, newPassword);
+    res.status(200).json({
+      status: "ok",
+      result,
+    });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+})
 
 module.exports = router;
