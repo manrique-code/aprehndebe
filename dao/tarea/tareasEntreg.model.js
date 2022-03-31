@@ -123,6 +123,44 @@ class TareasEntregable {
         }
     }
 
+    async entregada(idClase,idEstudiante,numeroTarea){
+        //EVALUAR SI LA TAREA YA EXISTE
+        const existCmd = [
+            {
+                $match: {
+                    idClase: ObjectId(idClase),
+                    idEstudiante: ObjectId(idEstudiante)
+                }
+            }, {
+                $project: {
+                    tareaEntregable: {
+                        $filter: {
+                            input: '$tareaEntregable',
+                            as: 'tareaEntregable',
+                            cond: {
+                                $eq: [
+                                    '$$tareaEntregable.numeroTarea',
+                                    numeroTarea
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+        const resExist = await this.collection.aggregate(existCmd).toArray()
+        const existe = resExist.map((tareaEntregada) => {
+            return tareaEntregada
+        })
+        const tareaExiste = existe[0].tareaEntregable
+
+        if(tareaExiste == 0){
+            return false;
+        }else{
+            return true
+        }
+    }
+
     /**
      * ACTUALIZACION DE TAREAS ENTREGADAS
      * @param {String} idClase utilizamos el identificador de clase para encontrar la matricula
@@ -205,6 +243,19 @@ class TareasEntregable {
             }
 
         }
+        const rslt = await this.collection.updateOne(filter, updateCmd);
+        return rslt;
+    }
+
+    async deleteEntregable(idclas,idest,num){
+        const filter = { 
+            idClase: new ObjectId(idclas),
+            idEstudiante: new ObjectId(idest)
+        };
+        
+        const updateCmd = {
+          $pull: { tareaEntregable: { numeroTarea: { $in: [num] } } },
+        };
         const rslt = await this.collection.updateOne(filter, updateCmd);
         return rslt;
     }

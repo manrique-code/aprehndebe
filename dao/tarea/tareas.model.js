@@ -106,6 +106,39 @@ class Tareas {
     return tareas.tareaAsignada;
   }
 
+  /**
+   * 
+   * @param {String} idclas identificador de la clase
+   * @param {String} num identificador de la tarea
+   * @returns array
+   */
+  async tareaById(idclas,num) {
+    const updateCmd = 
+      [
+        {
+          '$match': {
+            '_id': new ObjectId(idclas)
+          }
+        }, {
+          '$project': {
+            'tareaAsignada': {
+              '$filter': {
+                'input': '$tareaAsignada', 
+                'as': 'tareaAsignada', 
+                'cond': {
+                  '$eq': [
+                    '$$tareaAsignada.numeroTarea', num
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    const tareas = await this.collection.aggregate(updateCmd).toArray();
+    return tareas[0].tareaAsignada;
+  }
+
   // async updateEstadoTarea(id,numeroTarea,estado){
 
   // }
@@ -119,6 +152,7 @@ class Tareas {
     const rslt = await this.collection.updateOne(filter, updateCmd);
     return rslt;
   }
+
   getSecondsLeftHomework = async (tareas) => {
     console.log(tareas);
     const segundosFaltantes = tareas.map(async (tarea) => {

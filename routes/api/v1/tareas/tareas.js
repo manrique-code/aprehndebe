@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 const router = express.Router();
 const Tareas = require("../../../../dao/tarea/tareas.model");
 const TareasEntregable = require("../../../../dao/tarea/tareasEntreg.model");
@@ -14,10 +15,21 @@ router.get("/", (req, res) => {
   }
 });
 
-router.get("/alltareas/:id", async (req, res) => {
+router.get("/alltareas", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const rslt = await tareasModel.allTareasClase(id);
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
+router.get("/tareabyid", async (req, res) => {
+  try {
+    const { idclas,num } = req.query;
+    const rslt = await tareasModel.tareaById(idclas,num);
     res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
     console.log(ex);
@@ -64,18 +76,52 @@ router.put("/updateTarea/:id", async (req, res) => {
   }
 });
 
+router.get("/entregada", async(req,res)=>{
+  try{
+    const {idclas,idest,num} = req.query;
+    const rslt = await entregablesModel.entregada(idclas,idest,num)
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+})
 // RUTA PARA CREAR UN ENTREGABLE
-router.put("/newentregable/:idclas/:idest", async (req, res) => {
+// FUNCION QUE GUARDA EL ARCHIVO
+const storage = multer.diskStorage({
+  destination:'uploads/',
+  filename:(req,file,callback)=>{
+    callback('',file.originalname)
+    // callback('',file.name+"."+"pdf")
+  }
+})
+const upload = multer({
+    storage:storage
+})
+
+//RUTA QUE RECIVE EL ARCHIVO
+router.post('/file',upload.single("file"),async(req,res)=>{
+      res.status(200).json({ status: "ok" });
+});
+
+//RUTA PARA ALMACENAR LOS DATOS DE LA TAREA
+router.put("/newentregable", async (req, res) => {
   try {
-    const { idclas, idest } = req.params;
-    const { numeroTarea, documentoURL, estado,fechaEntrega } = req.body;
+    const { idclas, idest } = req.body.params;
+    console.log(req.body)
+    const { numeroTarea, documentoURL,archivo,estado,fechaEntrega } = req.body.body;
+    console.log(idclas);
+    console.log(idest);
+    console.log(numeroTarea);
+    console.log(documentoURL);
+    console.log(fechaEntrega);
 
     const rslt = await entregablesModel.newEntrega(
       idclas,
       idest,
       numeroTarea,
       fechaEntrega,
-      documentoURL,
+      documentoURL
     );
     res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
@@ -84,10 +130,10 @@ router.put("/newentregable/:idclas/:idest", async (req, res) => {
   }
 });
 
-router.put("/updateentregable/:idclas/:idest", async (req, res) => {
+router.put("/updateentregable", async (req, res) => {
   try {
-    const { idclas, idest } = req.params;
-    const { numeroTarea, documentoURL, estado,fechaEntrega} = req.body;
+    const { idclas, idest } = req.body.params;
+    const { numeroTarea, documentoURL, estado,fechaEntrega} = req.body.body;
     
     const rslt = await entregablesModel.updateEntrega(
       idclas,
@@ -105,9 +151,9 @@ router.put("/updateentregable/:idclas/:idest", async (req, res) => {
 });
 
 //router delete tarea()
-router.delete("/deleteTarea/:id/:idtarea", async (req, res) => {
+router.delete("/deletetarea", async (req, res) => {
   try {
-    const { id, idtarea } = req.params;
+    const { id, idtarea } = req.body.params;
     const result = await tareasModel.deleteTarea(id, idtarea);
     res.status(200).json({
       status: "ok",
@@ -119,10 +165,26 @@ router.delete("/deleteTarea/:id/:idtarea", async (req, res) => {
   }
 });
 
-//router para obtener las tareas pendientes por estudiante
-router.get("/tareasest/:idclas/:idest", async(req,res)=>{
+//router para eliminar una tarea que este entregada
+router.delete("/deleteentregable", async (req, res) => {
   try {
-    const {idest,idclas} = req.params;
+    const { idclas,idest,numeroTarea} = req.query;
+    const result = await entregablesModel.deleteEntregable(idclas,idest,numeroTarea)
+    res.status(200).json({
+      status: "ok",
+      //result,
+    });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+});
+
+//router para obtener las tareas pendientes por estudiante  /:idclas/:idest
+router.get("/tareasest", async(req,res)=>{
+  try {
+    const {idest,idclas} = req.query;
+    console.log(req.query)
     const rslt = await tareasModel.verTareasClaseEstudiante(idclas,idest);
     res.status(200).json({status:"ok",rslt})
   } catch (error) {
