@@ -218,4 +218,9 @@ router.put("/evaluartarea/:idclas/:idest", async(req,res)=>{
   }
 })
 
+router.get("/descargar/:id",async(req,res)=>{
+  const {id} = req.params;
+  res.download(__dirname+'../../../../../uploads/'+id,id)
+})
+
 module.exports = router;
