@@ -93,6 +93,11 @@ class TareasEntregable {
                 const fecha = tarea?.tareaAsignada[0]?.fechaEntrega
                 return fecha
             })
+
+            const info = res.map((tarea) => {
+                const informacion = tarea?.tareaAsignada[0]?.info
+                return informacion
+            })
             //transformamos las cadenas de texto a formato fecha para evaluarlas con la funcion isBefore
             //isBefore como su nombre lo dice, retorna un booleano si cumple la condicion de que una fecha esta situada antes que otra en este caso
             //si la fecha en la que se entrega la tarea esta dentro del rango y antes de la fecha limite para entregar tareas
@@ -113,6 +118,7 @@ class TareasEntregable {
                         fechaEntrega,
                         documentoURL,
                         estado,
+                        info:info[0]
                     }
                 }
             }
@@ -204,6 +210,7 @@ class TareasEntregable {
             const fecha = tarea?.tareaAsignada[0]?.fechaEntrega
             return fecha
         })
+
         //transformamos las cadenas de texto a formato fecha para evaluarlas con la funcion isBefore
         //isBefore como su nombre lo dice, retorna un booleano si cumple la condicion de que una fecha esta situada antes que otra en este caso
         //si la fecha en la que se entrega la tarea esta dentro del rango y antes de la fecha limite para entregar tareas
@@ -258,6 +265,23 @@ class TareasEntregable {
         };
         const rslt = await this.collection.updateOne(filter, updateCmd);
         return rslt;
+    }
+
+    async verTareasEntregadasEstudiante(idclas,idest){
+        const filter = [
+            {
+              '$match': {
+                'idClase': new ObjectId(idclas), 
+                'idEstudiante': new ObjectId(idest)
+              }
+            }, {
+              '$project': {
+                'tareaEntregable': 1
+              }
+            }
+        ]
+        const data = await this.collection.aggregate(filter).toArray()
+        return data
     }
 }
 

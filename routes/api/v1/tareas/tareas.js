@@ -17,8 +17,8 @@ router.get("/", (req, res) => {
 
 router.get("/alltareas", async (req, res) => {
   try {
-    const { id } = req.query;
-    const rslt = await tareasModel.allTareasClase(id);
+    const { idclas,idest } = req.query;
+    const rslt = await tareasModel.allTareasClase(idclas,idest);
     res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
     console.log(ex);
@@ -26,10 +26,22 @@ router.get("/alltareas", async (req, res) => {
   }
 });
 
+router.get("/allentregas", async(req,res)=>{
+  try {
+    const { idclas,idest } = req.query;
+    const rslt = await entregablesModel.verTareasEntregadasEstudiante(idclas,idest);
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  } 
+})
+
 router.get("/tareabyid", async (req, res) => {
   try {
     const { idclas,num } = req.query;
     const rslt = await tareasModel.tareaById(idclas,num);
+    console.log(rslt)
     res.status(200).json({ status: "ok", rslt });
   } catch (ex) {
     console.log(ex);

@@ -192,6 +192,7 @@ class Estudiantes {
       },
     };
     const rslt = await this.collection.updateOne(filtro, userStatus);
+    return rslt;
   }
 
       // Metodo para cambiar la contraseña del usuario estudiante
@@ -231,6 +232,11 @@ class Estudiantes {
     } else{
       return "Error"
     }
+  }
+
+  async verEstudiante(id){
+      const result  = await this.collection.findOne({"_id":new ObjectId(id)})
+      return result
   }
 }
 

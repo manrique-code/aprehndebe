@@ -150,6 +150,12 @@ async obtenerAnunciosPorClase(id){
   const rslt = await this.collection.findOne(filtro,busqueda);
   return rslt;
 }
+
+async verClase(id){
+  const rslt = await this.collection.findOne({"_id":new ObjectId(id)})
+  return rslt;
+}
+  
 }
 
 module.exports = Clases;

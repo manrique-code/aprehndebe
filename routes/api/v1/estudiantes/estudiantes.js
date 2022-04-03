@@ -250,4 +250,18 @@ router.put("/editpassword/:id", async (req, res) =>{
     res.status(500).json({ status: "failed" });
   }
 })
+
+router.get("/verestudiante/:id",async(req,res)=>{
+  try {
+    const {id} = req.params
+    const rslt = await estudianteModel.verEstudiante(id) 
+    res.status(200).json({
+      status: "ok",
+      rslt
+    });
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ status: "failed" });
+  }
+})
 module.exports = router;

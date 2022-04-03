@@ -180,4 +180,14 @@ router.get("/listado/:clase", async (req, res) => {
   }
 }); // get: /listado/:clase
 
+router.get("/verclase/:id",async(req,res)=>{
+  try {
+    const {id} = req.params
+    const rslt = await claseModel.verClase(id)
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    res.status(500).json({ status: "failed" });
+  }
+})
+
 module.exports = router;
