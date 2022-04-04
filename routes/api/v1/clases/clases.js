@@ -190,4 +190,14 @@ router.get("/verclase/:id",async(req,res)=>{
   }
 })
 
+router.get("/clasest/:id",async(req,res)=>{
+  try {
+    const {id} = req.params
+    const rslt = await matriculaModel.verClasesDeAlumno(id)
+    res.status(200).json({ status: "ok", rslt });
+  } catch (ex) {
+    res.status(500).json({ status: "failed" });
+  }
+})
+
 module.exports = router;

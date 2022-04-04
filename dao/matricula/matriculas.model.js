@@ -232,5 +232,31 @@ class Matricula {
     });
     return listados;
   };
+
+  verClasesDeAlumno = async(id)=>{
+    const comand = [
+      {
+        '$match': {
+          'idEstudiante': new ObjectId(id)
+        }
+      }, {
+        '$lookup': {
+          'from': 'Clases', 
+          'localField': 'idClase', 
+          'foreignField': '_id', 
+          'as': 'Clases'
+        }
+      }, {
+        '$project': {
+          'Clases': 1
+        }
+      }
+    ]
+
+    const result = await this.collection.aggregate(comand).toArray();
+    return result;
+
+  } 
+
 }
 module.exports = Matricula;
